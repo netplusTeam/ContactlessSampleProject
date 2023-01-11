@@ -1,0 +1,26 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+        // Add Permission for Netplus' Contactless sdk dependency
+        maven {
+            url "https://jitpack.io"
+            credentials { username "jp_h2namglqo2okk0oc6um0t9f61k" }
+        }
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        // Add Permission for Netplus' Contactless sdk dependency
+        maven {
+            url "https://jitpack.io"
+            credentials { username "jp_h2namglqo2okk0oc6um0t9f61k" }
+        }
+    }
+}
+rootProject.name = "NetplusContactlessSdkImplementationSampleProject"
+include ':app'

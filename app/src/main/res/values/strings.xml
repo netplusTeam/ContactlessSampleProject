@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">NetplusContactlessSdkImplementationSampleProject</string>
+    <string name="read_card">Read Card</string>
+    <string name="your_card_data_will_appear_here">Your card data will appear here</string>
+</resources>
