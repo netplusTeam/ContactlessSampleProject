@@ -52,3 +52,5 @@ class MainActivity : AppCompatActivity() {
         cardResultTextView = findViewById(R.id.result_tv)
     }
 }
+
+
