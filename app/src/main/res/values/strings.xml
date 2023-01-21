@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NetplusContactlessSdkImplementationSampleProject</string>
+    <string name="app_name">NETPLUS Contactless Sample App</string>
     <string name="read_card">Read Card</string>
     <string name="your_card_data_will_appear_here">Your card data will appear here</string>
     <string name="your_response_will_appear_here">Your Response will appear here</string>
@@ -14,4 +14,6 @@
     <string name="processing_payment">Processing Payment…</string>
     <string name="terminal_configured">Terminal configured successfully</string>
     <string name="terminal_config_failed">Terminal configuration failed</string>
+    <string name="check_balance">Check Balance</string>
+    <string name="checking_balance">Checking Balance…</string>
 </resources>

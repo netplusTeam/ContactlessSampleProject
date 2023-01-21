@@ -13,6 +13,7 @@ object AppUtils {
     const val CONFIG_DATA = "CONFIG_DATA"
     const val ERROR_TAG = "ERROR_TAG===>"
     const val TAG_MAKE_PAYMENT = "TAG_MAKE_PAYMENT"
+    const val TAG_CHECK_BALANCE = "TAG_CHECK_BALANCE"
     const val PAYMENT_SUCCESS_DATA_TAG = "PAYMENT_SUCCESS_DATA_TAG"
     const val PAYMENT_ERROR_DATA_TAG = "PAYMENT_ERROR_DATA_TAG"
     const val TAG_TERMINAL_CONFIGURATION = "TAG_TERMINAL_CONFIGURATION"
@@ -45,7 +46,7 @@ object AppUtils {
         partnerName = "Netplus",
         partnerId = "5de231d9-1be0-4c31-8658-6e15892f2b83",
         terminalId = "2033ALZP",
-        terminalSerialNumber = getDeviceSerialNumber(),
+        terminalSerialNumber = "0123456789ABC", // getDeviceSerialNumber(),
         businessAddress = "Marwa Lagos",
         customerName = "Test Account"
     )

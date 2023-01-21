@@ -6,10 +6,12 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.danbamitale.epmslib.entities.CardData
 import com.danbamitale.epmslib.entities.clearPinKey
+import com.danbamitale.epmslib.extensions.formatCurrencyAmount
 import com.google.gson.Gson
 import com.netpluspay.contactless.sdk.start.ContactlessSdk
 import com.netpluspay.contactless.sdk.utils.ContactlessReaderResult
@@ -25,12 +27,14 @@ import com.woleapp.netpluscontactlesssdkimplementationsampleproject.AppUtils.KEY
 import com.woleapp.netpluscontactlesssdkimplementationsampleproject.AppUtils.PAYMENT_ERROR_DATA_TAG
 import com.woleapp.netpluscontactlesssdkimplementationsampleproject.AppUtils.PAYMENT_SUCCESS_DATA_TAG
 import com.woleapp.netpluscontactlesssdkimplementationsampleproject.AppUtils.POS_ENTRY_MODE
+import com.woleapp.netpluscontactlesssdkimplementationsampleproject.AppUtils.TAG_CHECK_BALANCE
 import com.woleapp.netpluscontactlesssdkimplementationsampleproject.AppUtils.TAG_MAKE_PAYMENT
 import com.woleapp.netpluscontactlesssdkimplementationsampleproject.AppUtils.TAG_TERMINAL_CONFIGURATION
 import com.woleapp.netpluscontactlesssdkimplementationsampleproject.AppUtils.getSampleUserData
 import com.woleapp.netpluscontactlesssdkimplementationsampleproject.AppUtils.getSavedKeyHolder
 import com.woleapp.netpluscontactlesssdkimplementationsampleproject.dialog.LoadingDialog
 import com.woleapp.netpluscontactlesssdkimplementationsampleproject.models.CardResult
+import com.woleapp.netpluscontactlesssdkimplementationsampleproject.models.Status
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -39,6 +43,7 @@ import timber.log.Timber
 class MainActivity : AppCompatActivity() {
     private val gson: Gson = Gson()
     private lateinit var makePaymentButton: Button
+    private lateinit var checkBalanceButton: Button
     private lateinit var resultViewerTextView: TextView
     private lateinit var amountET: EditText
     private var userData: UserData = getSampleUserData()
@@ -46,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     private var previousAmount: Long? = null
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     var netposPaymentClient: NetposPaymentClient = NetposPaymentClient
-    private val resultLauncher =
+    private val makePaymentResultLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val data: Intent? = result.data
             if (result.resultCode == ContactlessReaderResult.RESULT_OK) {
@@ -69,12 +74,35 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+    private val checkBalanceResultLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val data: Intent? = result.data
+            if (result.resultCode == ContactlessReaderResult.RESULT_OK) {
+                data?.let { i ->
+                    val cardReadData = i.getStringExtra("data")!!
+                    val cardResult = gson.fromJson(cardReadData, CardResult::class.java)
+                    checkBalance(cardResult)
+                }
+            }
+            if (result.resultCode == ContactlessReaderResult.RESULT_ERROR) {
+                data?.let { i ->
+                    val error = i.getStringExtra("data")
+                    error?.let {
+                        Timber.d("ERROR_TAG===>%s", it)
+                        resultViewerTextView.text = it
+                    }
+                }
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         // Initialize Views
         initializeViews()
         configureTerminal()
+        netposPaymentClient.logUser(this, gson.toJson(userData))
+        Timber.d("DEVICE_SERIAL_NUMBER===>%s", getSampleUserData().terminalSerialNumber)
         makePaymentButton.setOnClickListener {
             resultViewerTextView.text = ""
             if (amountET.text.isNullOrEmpty() || amountET.text.toString().toLong() < 200L) {
@@ -82,25 +110,38 @@ class MainActivity : AppCompatActivity() {
                     .show()
                 return@setOnClickListener
             }
-            val amountToPay = amountET.text.toString().toLong()
-            val savedKeyHolder = getSavedKeyHolder()
+            val amountToPay = amountET.text.toString().toLong().toDouble()
 
-            savedKeyHolder?.run {
-                ContactlessSdk.readContactlessCard(
-                    this@MainActivity,
-                    resultLauncher,
-                    this.clearPinKey, // "86CBCDE3B0A22354853E04521686863D" // pinKey
-                    amountToPay.toDouble(), // amount
-                    0.0 // cashbackAmount(optional)
-                )
-            } ?: run {
-                Toast.makeText(
-                    this,
-                    getString(R.string.terminal_not_configured),
-                    Toast.LENGTH_LONG
-                ).show()
-                configureTerminal()
-            }
+            launchContactless(makePaymentResultLauncher, amountToPay)
+        }
+
+        checkBalanceButton.setOnClickListener {
+            launchContactless(checkBalanceResultLauncher, 200.0)
+        }
+    }
+
+    private fun launchContactless(
+        launcher: ActivityResultLauncher<Intent>,
+        amountToPay: Double,
+        cashBackAmount: Double = 0.0
+    ) {
+        val savedKeyHolder = getSavedKeyHolder()
+
+        savedKeyHolder?.run {
+            ContactlessSdk.readContactlessCard(
+                this@MainActivity,
+                launcher,
+                this.clearPinKey, // "86CBCDE3B0A22354853E04521686863D" // pinKey
+                amountToPay, // amount
+                cashBackAmount // cashbackAmount(optional)
+            )
+        } ?: run {
+            Toast.makeText(
+                this,
+                getString(R.string.terminal_not_configured),
+                Toast.LENGTH_LONG
+            ).show()
+            configureTerminal()
         }
     }
 
@@ -108,6 +149,7 @@ class MainActivity : AppCompatActivity() {
         makePaymentButton = findViewById(R.id.read_card_btn)
         resultViewerTextView = findViewById(R.id.result_tv)
         amountET = findViewById(R.id.amountToPay)
+        checkBalanceButton = findViewById(R.id.check_balance)
     }
 
     private fun configureTerminal() {
@@ -200,5 +242,42 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposable.clear()
+    }
+
+    private fun checkBalance(cardResult: CardResult) {
+        val loaderDialog: LoadingDialog = LoadingDialog()
+        loaderDialog.loadingMessage = getString(R.string.checking_balance)
+        loaderDialog.show(supportFragmentManager, TAG_CHECK_BALANCE)
+        val cardData = cardResult.cardReadResult.let {
+            CardData(it.track2Data, it.iccString, it.pan, POS_ENTRY_MODE).also { cardD ->
+                cardD.pinBlock = it.pinBlock
+            }
+        }
+        compositeDisposable.add(
+            netposPaymentClient.balanceEnquiry(this, cardData, IsoAccountType.SAVINGS.name)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { data, error ->
+                    data?.let {
+                        loaderDialog.dismiss()
+                        val responseString = if (it.responseCode == Status.APPROVED.statusCode) {
+                            "Response: APPROVED\nResponse Code: ${it.responseCode}\n\nAccount Balance:\n" + it.accountBalances.joinToString(
+                                "\n"
+                            ) { accountBalance ->
+                                "${accountBalance.accountType}: ${
+                                accountBalance.amount.div(100).formatCurrencyAmount()
+                                }"
+                            }
+                        } else {
+                            "Response: ${it.responseMessage}\nResponse Code: ${it.responseCode}"
+                        }
+                        resultViewerTextView.text = responseString
+                    }
+                    error?.let {
+                        loaderDialog.dismiss()
+                        resultViewerTextView.text = it.localizedMessage
+                    }
+                }
+        )
     }
 }
