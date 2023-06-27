@@ -31,7 +31,7 @@ android {
     }
 
     dataBinding {
-        enabled = true
+        enabled true
     }
 
     compileOptions {
@@ -52,9 +52,11 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     // Add Netplus' Contactless sdk dependency
-    implementation "org.bitbucket.netplustechteam:contactless_sdk:1.0.8"
-    api files('libs/epmslib-release.aar')
-    api files('libs/nibssclient-release.aar')
+    implementation "com.github.netplusTeam:contactless-sdk:1.0.19"
+
+    // Dependencies for Netpos Payment client
+    implementation "com.github.netplusTeam:netplus-epms:1.0.11"
+    implementation 'com.github.netplusTeam:NetposNibssClient:1.0.12'
 
     implementation 'pub.devrel:easypermissions:3.0.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'

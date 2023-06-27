@@ -42,13 +42,17 @@ object AppUtils {
     }
 
     fun getSampleUserData() = UserData(
-        businessName = "Netplus",
-        partnerName = "Netplus",
-        partnerId = "5de231d9-1be0-4c31-8658-6e15892f2b83",
-        terminalId = "2033ALZP",
-        terminalSerialNumber = "0123456789ABC", // getDeviceSerialNumber(),
-        businessAddress = "Marwa Lagos",
-        customerName = "Test Account"
+        "Netplus",
+        "Netplus",
+        "5de231d9-1be0-4c31-8658-6e15892f2b83",
+        "2033ALZP",
+        "0123456789ABC", // getDeviceSerialNumber(),
+        // getDeviceSerialNumber(),
+        "Marwa Lagos",
+        "Test Account",
+        "",
+        "",
+        "",
     )
 
     fun getSavedKeyHolder(): KeyHolder? {

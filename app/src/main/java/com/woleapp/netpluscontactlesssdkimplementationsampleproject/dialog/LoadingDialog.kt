@@ -15,7 +15,7 @@ class LoadingDialog(var loadingMessage: String = "Processing...") : DialogFragme
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding =
             DataBindingUtil.inflate(inflater, R.layout.layout_loading_dialog, container, false)
@@ -29,5 +29,10 @@ class LoadingDialog(var loadingMessage: String = "Processing...") : DialogFragme
             setBackgroundDrawableResource(R.drawable.curve_bg)
             isCancelable = false
         }
+    }
+
+    fun setMessage(newMessage: String) {
+        loadingMessage = newMessage
+        binding.loadingMessage.text = loadingMessage
     }
 }

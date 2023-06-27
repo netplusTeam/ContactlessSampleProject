@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    private val checkBalanceResultLauncher =
+    private val checkBalanceResultLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val data: Intent? = result.data
             if (result.resultCode == ContactlessReaderResult.RESULT_OK) {
@@ -123,7 +123,7 @@ class MainActivity : AppCompatActivity() {
     private fun launchContactless(
         launcher: ActivityResultLauncher<Intent>,
         amountToPay: Double,
-        cashBackAmount: Double = 0.0
+        cashBackAmount: Double = 0.0,
     ) {
         val savedKeyHolder = getSavedKeyHolder()
 
@@ -133,13 +133,13 @@ class MainActivity : AppCompatActivity() {
                 launcher,
                 this.clearPinKey, // "86CBCDE3B0A22354853E04521686863D" // pinKey
                 amountToPay, // amount
-                cashBackAmount // cashbackAmount(optional)
+                cashBackAmount, // cashbackAmount(optional)
             )
         } ?: run {
             Toast.makeText(
                 this,
                 getString(R.string.terminal_not_configured),
-                Toast.LENGTH_LONG
+                Toast.LENGTH_LONG,
             ).show()
             configureTerminal()
         }
@@ -157,7 +157,7 @@ class MainActivity : AppCompatActivity() {
         loaderDialog.loadingMessage = getString(R.string.configuring_terminal)
         loaderDialog.show(supportFragmentManager, TAG_TERMINAL_CONFIGURATION)
         compositeDisposable.add(
-            netposPaymentClient.init(this, false, Gson().toJson(userData))
+            netposPaymentClient.init(this, Gson().toJson(userData))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { data, error ->
@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(
                             this,
                             getString(R.string.terminal_configured),
-                            Toast.LENGTH_LONG
+                            Toast.LENGTH_LONG,
                         ).show()
                         loaderDialog.dismiss()
                         val keyHolder = response.first
@@ -180,12 +180,12 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(
                             this,
                             getString(R.string.terminal_config_failed),
-                            Toast.LENGTH_LONG
+                            Toast.LENGTH_LONG,
                         ).show()
                         loaderDialog.dismiss()
                         Timber.d("%s%s", ERROR_TAG, it.localizedMessage)
                     }
-                }
+                },
         )
     }
 
@@ -204,7 +204,7 @@ class MainActivity : AppCompatActivity() {
                     amount = amountToPay,
                     terminalId = userData.terminalId,
                     cardData = cdData,
-                    accountType = IsoAccountType.SAVINGS
+                    accountType = IsoAccountType.SAVINGS,
                 )
             }
         cardData.pinBlock = cardResult.cardReadResult.pinBlock
@@ -215,7 +215,7 @@ class MainActivity : AppCompatActivity() {
                 gson.toJson(makePaymentParams),
                 cardResult.cardScheme,
                 CARD_HOLDER_NAME,
-                "TESTING_TESTING"
+                "TESTING_TESTING",
             ).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -224,7 +224,7 @@ class MainActivity : AppCompatActivity() {
                         resultViewerTextView.text = gson.toJson(transactionWithRemark)
                         Timber.d(
                             "$PAYMENT_SUCCESS_DATA_TAG%s",
-                            gson.toJson(transactionWithRemark)
+                            gson.toJson(transactionWithRemark),
                         )
                     },
                     { throwable ->
@@ -232,10 +232,10 @@ class MainActivity : AppCompatActivity() {
                         resultViewerTextView.text = throwable.localizedMessage
                         Timber.d(
                             "$PAYMENT_ERROR_DATA_TAG%s",
-                            throwable.localizedMessage
+                            throwable.localizedMessage,
                         )
-                    }
-                )
+                    },
+                ),
         )
     }
 
@@ -262,10 +262,10 @@ class MainActivity : AppCompatActivity() {
                         loaderDialog.dismiss()
                         val responseString = if (it.responseCode == Status.APPROVED.statusCode) {
                             "Response: APPROVED\nResponse Code: ${it.responseCode}\n\nAccount Balance:\n" + it.accountBalances.joinToString(
-                                "\n"
+                                "\n",
                             ) { accountBalance ->
                                 "${accountBalance.accountType}: ${
-                                accountBalance.amount.div(100).formatCurrencyAmount()
+                                    accountBalance.amount.div(100).formatCurrencyAmount()
                                 }"
                             }
                         } else {
@@ -277,7 +277,7 @@ class MainActivity : AppCompatActivity() {
                         loaderDialog.dismiss()
                         resultViewerTextView.text = it.localizedMessage
                     }
-                }
+                },
         )
     }
 }

@@ -25,7 +25,7 @@ class App : Application() {
                 // Disable taking screenshot or video recording
                 activity.window.setFlags(
                     WindowManager.LayoutParams.FLAG_SECURE,
-                    WindowManager.LayoutParams.FLAG_SECURE
+                    WindowManager.LayoutParams.FLAG_SECURE,
                 )
             }
 
