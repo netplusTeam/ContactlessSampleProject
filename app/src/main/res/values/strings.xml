@@ -1,5 +1,19 @@
 <resources>
-    <string name="app_name">NetplusContactlessSdkImplementationSampleProject</string>
+    <string name="app_name">NETPLUS Contactless Sample App</string>
     <string name="read_card">Read Card</string>
     <string name="your_card_data_will_appear_here">Your card data will appear here</string>
+    <string name="your_response_will_appear_here">Your Response will appear here</string>
+    <string name="enter_amount">Enter Amount</string>
+    <string name="make_payment">Make Payment</string>
+    <string name="enter_valid_amount">Invalid amount!, amount can not be less than 200 kobo</string>
+    <string name="terminal_not_configured">Terminal has not being configured!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="processing">Processing…</string>
+    <string name="configuring_terminal">Configuring Terminal \nPlease Wait…</string>
+    <string name="processing_payment">Processing Payment…</string>
+    <string name="terminal_configured">Terminal configured successfully</string>
+    <string name="terminal_config_failed">Terminal configuration failed</string>
+    <string name="check_balance">Check Balance</string>
+    <string name="checking_balance">Checking Balance…</string>
 </resources>

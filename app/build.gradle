@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -23,12 +25,27 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    dataBinding {
+        enabled true
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+    ndkVersion '21.3.6528147'
+    externalNativeBuild {
+        ndkBuild {
+            path file('src/main/jni/Android.mk')
+        }
     }
 }
 
@@ -41,5 +58,36 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     // Add Netplus' Contactless sdk dependency
-    implementation "org.bitbucket.netplustechteam:contactless_sdk:1.0.8"
+    implementation "com.github.netplusTeam:contactless-sdk:1.0.19"
+
+    // Dependencies for Netpos Payment client
+    implementation "com.github.netplusTeam:netplus-epms:1.0.11"
+    implementation 'com.github.netplusTeam:NetposNibssClient:1.0.12'
+
+    implementation 'pub.devrel:easypermissions:3.0.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation 'net.sf.j8583:j8583:1.17.0'
+    // Retrofit (Can be left out if you are already using retrofit)
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.2")
+
+    //room (This can be left out if you are already using room)
+    implementation "androidx.room:room-runtime:2.4.2"
+    kapt "androidx.room:room-compiler:2.4.2"
+    implementation "androidx.room:room-rxjava2:2.4.2"
+
+    //preference
+    implementation("androidx.preference:preference-ktx:1.2.0")
+    implementation 'com.pixplicity.easyprefs:EasyPrefs:1.10.0'
+
+    def lifecycle_version = "2.4.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+
+    //workmanager
+    // For Kotlin
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
 }

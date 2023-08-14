@@ -6,16 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <EditText
+        android:id="@+id/amountToPay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dimen_10dp"
+        android:autofillHints="237"
+        android:ems="10"
+        android:hint="@string/enter_amount"
+        android:inputType="number"
+        android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/read_card_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/dimen_20dp"
-        android:text="@string/read_card"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="@string/make_payment"
+        app:layout_constraintEnd_toStartOf="@+id/check_balance"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/amountToPay" />
+
+    <Button
+        android:id="@+id/check_balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/check_balance"
+        app:layout_constraintBottom_toBottomOf="@+id/read_card_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/read_card_btn"
+        app:layout_constraintTop_toTopOf="@+id/read_card_btn" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
@@ -31,8 +56,9 @@
             android:id="@+id/result_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/your_card_data_will_appear_here"
+            android:text="@string/your_response_will_appear_here"
             android:textSize="@dimen/dien_18sp" />
 
     </androidx.core.widget.NestedScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
