@@ -2,6 +2,7 @@ package com.woleapp.netpluscontactlesssdkimplementationsampleproject
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -39,6 +40,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
+import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity() {
     private val gson: Gson = Gson()
@@ -46,9 +48,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var checkBalanceButton: Button
     private lateinit var resultViewerTextView: TextView
     private lateinit var amountET: EditText
+    private lateinit var accountType: com.danbamitale.epmslib.utils.IsoAccountType
     private var userData: UserData = getSampleUserData()
     private var cardData: CardData? = null
     private var previousAmount: Long? = null
+//    private var btnColor:Int = resources.getColor(com.netpluspay.contactless.sdk.R.color.colorPrimary)
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     var netposPaymentClient: NetposPaymentClient = NetposPaymentClient
     private val makePaymentResultLauncher =
@@ -101,6 +105,7 @@ class MainActivity : AppCompatActivity() {
         // Initialize Views
         initializeViews()
         configureTerminal()
+//        val btnColor =
         netposPaymentClient.logUser(this, gson.toJson(userData))
         Timber.d("DEVICE_SERIAL_NUMBER===>%s", getSampleUserData().terminalSerialNumber)
         makePaymentButton.setOnClickListener {
@@ -110,14 +115,15 @@ class MainActivity : AppCompatActivity() {
                     .show()
                 return@setOnClickListener
             }
-            val amountToPay = amountET.text.toString().toLong().toDouble()
 
+            val amountToPay = amountET.text.toString().toLong().toDouble()
             launchContactless(makePaymentResultLauncher, amountToPay)
         }
-
-        checkBalanceButton.setOnClickListener {
-            launchContactless(checkBalanceResultLauncher, 200.0)
-        }
+//        val btnColor = this.resources.getColor(R.color.black)
+//
+//        checkBalanceButton.setOnClickListener {
+//            launchContactless(checkBalanceResultLauncher, 200.0, btnColor)
+//        }
     }
 
     private fun launchContactless(
@@ -134,7 +140,8 @@ class MainActivity : AppCompatActivity() {
                 this.clearPinKey, // "86CBCDE3B0A22354853E04521686863D" // pinKey
                 amountToPay, // amount
                 cashBackAmount, // cashbackAmount(optional)
-            )
+                colorCode = R.color.teal_700
+                )
         } ?: run {
             Toast.makeText(
                 this,
@@ -205,9 +212,11 @@ class MainActivity : AppCompatActivity() {
                     terminalId = userData.terminalId,
                     cardData = cdData,
                     accountType = IsoAccountType.SAVINGS,
+                    remark = ""
                 )
             }
         cardData.pinBlock = cardResult.cardReadResult.pinBlock
+        Log.d("CHECKING", "CHECKING_HERE")
         compositeDisposable.add(
             netposPaymentClient.makePayment(
                 this,
@@ -215,7 +224,8 @@ class MainActivity : AppCompatActivity() {
                 gson.toJson(makePaymentParams),
                 cardResult.cardScheme,
                 CARD_HOLDER_NAME,
-                "TESTING_TESTING",
+                rrn = "123456789101",
+                stan = "123456"
             ).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

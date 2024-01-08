@@ -50,7 +50,7 @@ object AppUtils {
         // getDeviceSerialNumber(),
         "Marwa Lagos",
         "Test Account",
-        "",
+        "123456789",
         "",
         "",
     )
